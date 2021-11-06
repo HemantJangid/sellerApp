@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import globalStyles from '../constants/styles';
-import {Avatar} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Header from '../components/Header';
 import appTheme, {FONTS} from '../constants/theme';
@@ -21,183 +20,107 @@ import ToggleSwitch from 'toggle-switch-react-native';
 import FilterModal from './FilterModal';
 import SortModal from './SortModal';
 import {COLORS} from './../constants/theme';
+import {useSelector} from 'react-redux';
+import {axiosAll} from '../utility/axiosAll';
+import axios from 'axios';
+import requestUrls from '../constants/requestUrls';
+import {TextInput} from 'react-native';
 
 const ProductScreen = ({navigation}) => {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showSortModal, setShowSortModal] = useState(false);
   const [rerender, setrerender] = useState(true);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [filters, setFilters] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const data = [
-    {
-      id: 1,
-      name: 'Handbag',
-      images: [
-        'https://theleathergarden.com/media/catalog/product/cache/051e751c543d1559e85a534f442fde7f/e/d/editorialhpb-1.jpg',
-      ],
-      price: 280,
-      selling_price: 250,
-      mrp: 500,
-      quantity: 50,
-      status: 'active',
-      tags: ['New', 'Handbag'],
-      category: 'Handbag',
-    },
-    {
-      id: 2,
-      name: 'Handbag',
-      images: [
-        'https://5.imimg.com/data5/WB/SS/MY-59654262/ladies-designer-handbag-500x500.jpg',
-      ],
-      price: 280,
-      selling_price: 250,
-      mrp: 500,
-      quantity: 50,
-      status: 'active',
-      tags: ['New', 'Handbag'],
-      category: 'Handbag',
-    },
-    {
-      id: 3,
-      name: 'Handbag',
-      images: [
-        'https://m.media-amazon.com/images/I/7164mGGMT-L._AC_SL1500_.jpg',
-      ],
-      price: 280,
-      selling_price: 250,
-      mrp: 500,
-      quantity: 50,
-      status: 'active',
-      tags: ['New', 'Handbag'],
-      category: 'Handbag',
-    },
-    {
-      id: 4,
-      name: 'Handbag',
-      images: [
-        'https://theleathergarden.com/media/catalog/product/cache/051e751c543d1559e85a534f442fde7f/e/d/editorialhpb-1.jpg',
-      ],
-      price: 280,
-      selling_price: 250,
-      mrp: 500,
-      quantity: 50,
-      status: 'active',
-      tags: ['New', 'Handbag'],
-      category: 'Handbag',
-    },
-    {
-      id: 5,
-      name: 'Handbag',
-      images: [
-        'https://theleathergarden.com/media/catalog/product/cache/051e751c543d1559e85a534f442fde7f/e/d/editorialhpb-1.jpg',
-      ],
-      price: 280,
-      selling_price: 250,
-      mrp: 500,
-      quantity: 50,
-      status: 'active',
-      tags: ['New', 'Handbag'],
-      category: 'Handbag',
-    },
-    {
-      id: 6,
-      name: 'Handbag',
-      images: [
-        'https://theleathergarden.com/media/catalog/product/cache/051e751c543d1559e85a534f442fde7f/e/d/editorialhpb-1.jpg',
-      ],
-      price: 280,
-      selling_price: 250,
-      mrp: 500,
-      quantity: 50,
-      status: 'inactive',
-      tags: ['New', 'Handbag'],
-      category: 'Handbag',
-    },
-    {
-      id: 7,
-      name: 'Handbag',
-      images: [
-        'https://theleathergarden.com/media/catalog/product/cache/051e751c543d1559e85a534f442fde7f/e/d/editorialhpb-1.jpg',
-      ],
-      price: 280,
-      selling_price: 250,
-      mrp: 500,
-      quantity: 50,
-      status: 'active',
-      tags: ['New', 'Handbag'],
-      category: 'Handbag',
-    },
-    {
-      id: 8,
-      name: 'Handbag',
-      images: [
-        'https://theleathergarden.com/media/catalog/product/cache/051e751c543d1559e85a534f442fde7f/e/d/editorialhpb-1.jpg',
-      ],
-      price: 280,
-      selling_price: 250,
-      mrp: 500,
-      quantity: 50,
-      status: 'inactive',
-      tags: ['New', 'Handbag'],
-      category: 'Handbag',
-    },
-    {
-      id: 9,
-      name: 'Handbag',
-      images: [
-        'https://theleathergarden.com/media/catalog/product/cache/051e751c543d1559e85a534f442fde7f/e/d/editorialhpb-1.jpg',
-      ],
-      price: 280,
-      selling_price: 250,
-      mrp: 500,
-      quantity: 50,
-      status: 'inactive',
-      tags: ['New', 'Handbag'],
-      category: 'Handbag',
-    },
-    {
-      id: 10,
-      name: 'Handbag',
-      images: [
-        'https://theleathergarden.com/media/catalog/product/cache/051e751c543d1559e85a534f442fde7f/e/d/editorialhpb-1.jpg',
-      ],
-      price: 280,
-      selling_price: 250,
-      mrp: 500,
-      quantity: 50,
-      status: 'active',
-      tags: ['New', 'Handbag'],
-      category: 'Handbag',
-    },
-    {
-      id: 11,
-      name: 'Handbag',
-      images: [
-        'https://theleathergarden.com/media/catalog/product/cache/051e751c543d1559e85a534f442fde7f/e/d/editorialhpb-1.jpg',
-      ],
-      price: 280,
-      selling_price: 250,
-      mrp: 500,
-      quantity: 50,
-      status: 'active',
-      tags: ['New', 'Handbag'],
-      category: 'Handbag',
-    },
-  ];
+  const {userDetails} = useSelector(state => state.userReducer);
 
-  const [products, setProducts] = useState(data);
+  useEffect(() => {
+    navigation.addListener('focus', payload => {
+      getProducts();
+    });
+  }, []);
+
+  useEffect(() => {
+    getProducts();
+  }, []);
+
+  useEffect(() => {
+    filterProducts();
+  }, [filters]);
+
+  function getProducts() {
+    setLoading(true);
+    axios
+      .get(`${requestUrls.baseUrl}${requestUrls.products}`, {
+        params: {shopId: userDetails.shopId, verified: 1},
+      })
+      .then(response => {
+        console.log("products: ", response);
+        setLoading(false);
+        if (response.status === 201) {
+        } else if (response.status === 200) {
+          setProducts(response.data.products);
+          setLoading(false);
+        }
+      }).catch = err => {
+      console.log(err);
+    };
+  }
+
+  function filterProducts() {
+    let filteredProducts = [];
+    for (let i = 0; i < products.length; i++) {
+      for (let j = 0; j < filters.length; j++) {
+        if (products[i].categoryId === filters[j].value) {
+          filteredProducts.push(products[i]);
+        }
+      }
+    }
+
+    setFilteredProducts(filteredProducts);
+    setrerender(!rerender);
+  }
 
   function handleToggle(id, isOn) {
     let data = products;
-    let productIndex = data.findIndex(item => item.id === id);
-    data[productIndex].status = isOn ? 'active' : 'inactive';
+    let productIndex = data.findIndex(item => item.productId === id);
+    data[productIndex].isLive = isOn;
+    axios
+      .post(`${requestUrls.baseUrl}${requestUrls.changeStatus}`, {
+        productIds: `${data[productIndex].productId}`,
+        isLive: data[productIndex].isLive ? 1 : 0,
+      })
+      .then(response => {
+        if (response.status === 200) {
+          console.log('successfull request');
+        }
+      }).catch = err => {
+      console.log(err);
+    };
     setProducts(data);
     setrerender(!rerender);
   }
 
   function changeQuantity(changeType, id) {
     let data = products;
-    let productIndex = data.findIndex(item => item.id === id);
+    let productIndex = data.findIndex(item => item.productId === id);
     data[productIndex].quantity += changeType === 'increase' ? 1 : -1;
+    axios
+      .post(`${requestUrls.baseUrl}${requestUrls.changeQuantity}`, {
+        productId: data[productIndex].productId,
+        quantity: data[productIndex].quantity,
+      })
+      .then(response => {
+        if (response.status === 200) {
+          console.log('successfull request');
+        }
+      }).catch = err => {
+      console.log(err);
+    };
     setProducts(data);
     setrerender(!rerender);
   }
@@ -205,17 +128,18 @@ const ProductScreen = ({navigation}) => {
   function productCard({item, index}) {
     return (
       <TouchableHighlight
-        onPress={() =>
+        onPress={() => {
           navigation.navigate('ProductDetails', {
             headerTitle: item.name,
-          })
-        }
+            productInfo: item,
+          });
+        }}
         style={[
           styles.cardContainer,
           {marginBottom: index === products.length - 1 ? 110 : 10},
         ]}>
         <View style={[styles.productCard]}>
-          <Image source={{uri: item.images[0]}} style={styles.productImage} />
+          <Image source={{uri: item.photoLink}} style={styles.productImage} />
           <View style={styles.productInfo}>
             <View
               style={{
@@ -228,10 +152,10 @@ const ProductScreen = ({navigation}) => {
                 {item.name}
               </Text>
               <ToggleSwitch
-                isOn={item.status === 'active'}
+                isOn={item.isLive}
                 onColor="green"
                 size="small"
-                onToggle={isOn => handleToggle(item.id, isOn)}
+                onToggle={isOn => handleToggle(item.productId, isOn)}
               />
             </View>
             <View
@@ -260,7 +184,7 @@ const ProductScreen = ({navigation}) => {
                     name="minus"
                     color="black"
                     size={25}
-                    onPress={() => changeQuantity('decrease', item.id)}
+                    onPress={() => changeQuantity('decrease', item.productId)}
                   />
                 </View>
                 <Text style={[FONTS.body3, {marginHorizontal: 10}]}>
@@ -279,7 +203,7 @@ const ProductScreen = ({navigation}) => {
                     name="plus"
                     color="black"
                     size={25}
-                    onPress={() => changeQuantity('increase', item.id)}
+                    onPress={() => changeQuantity('increase', item.productId)}
                   />
                 </View>
               </View>
@@ -297,7 +221,7 @@ const ProductScreen = ({navigation}) => {
               </Text>
               <Text
                 style={[appTheme.FONTS.body4, {color: appTheme.COLORS.gray}]}>
-                ₹{item.selling_price}
+                ₹{item.sp}
               </Text>
             </View>
             <View
@@ -329,7 +253,7 @@ const ProductScreen = ({navigation}) => {
               </Text>
               <Text
                 style={[appTheme.FONTS.body4, {color: appTheme.COLORS.gray}]}>
-                {item.category}
+                {item.categoryName}
               </Text>
             </View>
             {/* <View
@@ -367,11 +291,53 @@ const ProductScreen = ({navigation}) => {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: 20,
+          marginVertical: 10,
+          paddingHorizontal: 10,
         }}>
-        <TouchableOpacity onPress={() => setShowSortModal(true)}>
+        {/* <TouchableOpacity onPress={() => setShowSortModal(true)}>
           <Icon name="sort-variant" color={appTheme.COLORS.gray} size={30} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <View
+          style={{
+            flexDirection: 'row',
+            width: '88%',
+            backgroundColor: COLORS.lightGray,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginLeft: 8,
+            height: 50,
+            borderRadius: 30,
+          }}>
+          <TextInput
+            key="searchText"
+            style={[
+              FONTS.body3,
+              {
+                height: 50,
+                width: '88%',
+                backgroundColor: 'transparent',
+                borderBottomWidth: 0,
+                paddingLeft: 20,
+              },
+            ]}
+            placeholder="Search"
+            placeholderTextColor={COLORS.gray}
+            value={searchQuery}
+            onChangeText={text => setSearchQuery(text)}
+            onSubmitEditing={() => {
+              console.log('search: ', searchQuery);
+            }}
+          />
+          {searchQuery.length !== 0 && (
+            <TouchableOpacity
+              onPress={() => {
+                setSearchQuery('');
+              }}
+              style={{marginRight: 10}}>
+              <Icon name="cancel" color={appTheme.COLORS.gray} size={20} />
+            </TouchableOpacity>
+          )}
+        </View>
         <TouchableOpacity onPress={() => setShowFilterModal(true)}>
           <Icon name="filter" color={appTheme.COLORS.gray} size={30} />
         </TouchableOpacity>
@@ -384,30 +350,58 @@ const ProductScreen = ({navigation}) => {
       {/* Filter */}
       {showFilterModal && (
         <FilterModal
+          filterProducts={filterProducts}
+          filters={filters}
+          setFilters={setFilters}
           isVisible={showFilterModal}
           onClose={() => setShowFilterModal(false)}
         />
       )}
 
-      {showSortModal && (
+      {/* {showSortModal && (
         <SortModal
           isVisible={showSortModal}
           onClose={() => setShowSortModal(false)}
         />
-      )}
+      )} */}
 
       {/* <Header name="Products" button="plus" navigation={navigation} /> */}
+      {productFilterAndSort()}
       <View style={styles.productSection}>
         <View style={styles.productCards}>
           <FlatList
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
-            data={products}
-            style={{paddingTop: 20}}
-            ListHeaderComponent={() => productFilterAndSort()}
+            data={filters.length > 0 ? filteredProducts : products}
+            style={{
+              marginBottom: 70
+            }}
+            // ListHeaderComponent={() => productFilterAndSort()}
             renderItem={({item, index}) => productCard({item, index})}
             keyExtractor={(item, index) => index}
+            onRefresh={() => getProducts()}
+            refreshing={loading}
           />
+
+          {filters.length > 0 && filteredProducts.length === 0 && (
+            <Text
+              style={[
+                appTheme.FONTS.body3,
+                {textAlign: 'center', marginTop: appTheme.SIZES.padding},
+              ]}>
+              No Products to show here.
+            </Text>
+          )}
+
+          {filters.length === 0 && products.length === 0 && (
+            <Text
+              style={[
+                appTheme.FONTS.body3,
+                {textAlign: 'center', marginTop: appTheme.SIZES.padding},
+              ]}>
+              No Products to show here.
+            </Text>
+          )}
         </View>
       </View>
     </>

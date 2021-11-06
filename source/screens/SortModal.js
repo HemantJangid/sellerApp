@@ -53,7 +53,6 @@ const SortModal = ({isVisible, onClose}) => {
     outputRange: [SIZES.height, SIZES.height - 550],
   });
 
-  console.log('sortBy: ', sortBy);
 
   return (
     <Modal animationType="fade" transparent={true} visible={isVisible}>
@@ -80,7 +79,9 @@ const SortModal = ({isVisible, onClose}) => {
             borderTopRightRadius: SIZES.padding,
             borderTopLeftRadius: SIZES.padding,
             backgroundColor: COLORS.white,
-          }}>
+          }}
+          showsVerticalScrollIndicator={false}
+          >
           {/* Header */}
           <View
             style={{

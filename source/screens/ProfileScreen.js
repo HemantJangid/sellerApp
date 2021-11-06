@@ -12,11 +12,13 @@ import globalStyles from '../constants/styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Header from '../components/Header';
 import appTheme from './../constants/theme';
+import {useDispatch, useSelector} from 'react-redux';
 
 const ProfileScreen = () => {
+  const {userDetails} = useSelector(state => state.userReducer);
   return (
     <ScrollView style={styles.container}>
-      <Header name="Profile" />
+      {/* <Header name="Profile" /> */}
       <View style={styles.userInfoSection}>
         <View style={{flexDirection: 'row', marginTop: 15}}>
           <Avatar.Image
@@ -25,48 +27,106 @@ const ProfileScreen = () => {
             }}
             size={80}
           />
-          <View style={{marginLeft: 20}}>
-            <Title style={appTheme.FONTS.h2}>John Doe</Title>
-            <Caption style={appTheme.FONTS.body3}>@j_doe</Caption>
-          </View>
+          {userDetails.name && userDetails.shopName && (
+            <View style={{marginLeft: 20}}>
+              <Title style={appTheme.FONTS.h2}>{userDetails.shopName}</Title>
+              <Caption style={appTheme.FONTS.body3}>{userDetails.name}</Caption>
+            </View>
+          )}
         </View>
       </View>
 
       <View style={[styles.userInfoSection, {paddingTop: 20}]}>
-        <View style={styles.row}>
-          <Icon
-            name="map-marker-radius"
-            color={appTheme.COLORS.gray}
-            size={20}
-          />
-          <Text
-            style={[
-              {color: appTheme.COLORS.gray, marginLeft: 20},
-              appTheme.FONTS.body3,
-            ]}>
-            Kolkata, India
-          </Text>
-        </View>
-        <View style={styles.row}>
-          <Icon name="phone" color={appTheme.COLORS.gray} size={20} />
-          <Text
-            style={[
-              {color: appTheme.COLORS.gray, marginLeft: 20},
-              appTheme.FONTS.body3,
-            ]}>
-            +91-900000009
-          </Text>
-        </View>
-        <View style={styles.row}>
-          <Icon name="email" color={appTheme.COLORS.gray} size={20} />
-          <Text
-            style={[
-              {color: appTheme.COLORS.gray, marginLeft: 20},
-              appTheme.FONTS.body3,
-            ]}>
-            john_doe@email.com
-          </Text>
-        </View>
+        {userDetails.address && (
+          <View style={styles.row}>
+            <Text
+              style={[{color: appTheme.COLORS.black}, appTheme.FONTS.body3]}>
+              Address:
+            </Text>
+            <Text
+              style={[
+                {color: appTheme.COLORS.gray, marginLeft: 20, width: '75%'},
+                appTheme.FONTS.body3,
+              ]}>
+              {userDetails.address}
+            </Text>
+          </View>
+        )}
+        {userDetails.mobile && (
+          <View style={styles.row}>
+            <Text
+              style={[{color: appTheme.COLORS.black}, appTheme.FONTS.body3]}>
+              Mobile:
+            </Text>
+            <Text
+              style={[
+                {color: appTheme.COLORS.gray, marginLeft: 20, width: '75%'},
+                appTheme.FONTS.body3,
+              ]}>
+              {userDetails.mobile}
+            </Text>
+          </View>
+        )}
+        {userDetails.emailAddress && (
+          <View style={styles.row}>
+            <Text
+              style={[{color: appTheme.COLORS.black}, appTheme.FONTS.body3]}>
+              Email Id:
+            </Text>
+            <Text
+              style={[
+                {color: appTheme.COLORS.gray, marginLeft: 20, width: '75%'},
+                appTheme.FONTS.body3,
+              ]}>
+              {userDetails.emailAddress}
+            </Text>
+          </View>
+        )}
+        {userDetails.broaderCategory && (
+          <View style={styles.row}>
+            <Text
+              style={[{color: appTheme.COLORS.black}, appTheme.FONTS.body3]}>
+              Category:
+            </Text>
+            <Text
+              style={[
+                {color: appTheme.COLORS.gray, marginLeft: 20, width: '75%'},
+                appTheme.FONTS.body3,
+              ]}>
+              {userDetails.broaderCategory}
+            </Text>
+          </View>
+        )}
+        {userDetails.gst && (
+          <View style={styles.row}>
+            <Text
+              style={[{color: appTheme.COLORS.black}, appTheme.FONTS.body3]}>
+              GST:
+            </Text>
+            <Text
+              style={[
+                {color: appTheme.COLORS.gray, marginLeft: 20, width: '75%'},
+                appTheme.FONTS.body3,
+              ]}>
+              {userDetails.gst}
+            </Text>
+          </View>
+        )}
+        {userDetails.quota && (
+          <View style={styles.row}>
+            <Text
+              style={[{color: appTheme.COLORS.black}, appTheme.FONTS.body3]}>
+              Quota:
+            </Text>
+            <Text
+              style={[
+                {color: appTheme.COLORS.gray, marginLeft: 20, width: '75%'},
+                appTheme.FONTS.body3,
+              ]}>
+              {userDetails.quota}
+            </Text>
+          </View>
+        )}
       </View>
       {/* 
       <View style={styles.infoBoxWrapper}>
@@ -87,7 +147,7 @@ const ProfileScreen = () => {
         </View>
       </View> */}
 
-      <View style={styles.menuWrapper}>
+      {/* <View style={styles.menuWrapper}>
         <TouchableRipple style={styles.menuItemContainer} onPress={() => {}}>
           <View style={styles.menuItem}>
             <Icon
@@ -136,7 +196,7 @@ const ProfileScreen = () => {
             </Text>
           </View>
         </TouchableRipple>
-      </View>
+      </View> */}
     </ScrollView>
   );
 };

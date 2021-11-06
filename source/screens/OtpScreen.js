@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, {useState, useRef} from 'react';
 import {
   View,
@@ -6,23 +7,31 @@ import {
   TextInput,
   Button,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
+import {ActivityIndicator} from 'react-native-paper';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {useDispatch} from 'react-redux';
+import requestUrls from '../constants/requestUrls';
+import {addUser} from '../redux/actions/user';
 import globalStyles from './../constants/styles';
 import {COLORS, FONTS, SIZES} from './../constants/theme';
 
-const OtpScreen = ({navigation}) => {
+const OtpScreen = ({navigation, route, ...props}) => {
   const [pins, setPins] = useState({
     pin1: '',
     pin2: '',
     pin3: '',
     pin4: '',
   });
+  const [loading, setLoading] = useState(false);
   const [rerender, setrerender] = useState(true);
   const pin1ref = useRef();
   const pin2ref = useRef();
   const pin3ref = useRef();
   const pin4ref = useRef();
+
+  const dispatch = useDispatch();
 
   function onChangeNumber(number, pinElement, nextElementRef) {
     let data = pins;
@@ -35,8 +44,43 @@ const OtpScreen = ({navigation}) => {
   }
 
   function handleVerify() {
+    setLoading(true);
     if (allPinsFilled()) {
-      navigation.navigate('Tabs');
+      let loginData = {
+        mobile: route.params.mobile,
+        otp: `${pins.pin1}${pins.pin2}${pins.pin3}${pins.pin4}`,
+        app: 'SELLER',
+      };
+      axios
+        .post(`${requestUrls.baseUrl}${requestUrls.verityOTP}`, loginData)
+        .then(response => {
+          console.log('login: ', response);
+          setLoading(false);
+          if (response.status === 201) {
+            Alert.alert(
+              'Mobile not verified try again in sometime!',
+              response.data,
+              [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+            );
+          } else if (response.status === 200) {
+            let shop = response.data.shopDetail[0];
+            let user = response.data.userDetail[0];
+            let userDetails = {...shop, ...user};
+            dispatch(addUser(userDetails));
+            navigation.navigate(
+              userDetails.userId
+                ? userDetails.role === 'ADMIN'
+                  ? 'AdminTabs'
+                  : 'Tabs'
+                : 'LandingScreen',
+            );
+          }
+        }).catch = err => {
+        Alert.alert('SignIn Failed', err, [
+          {text: 'OK', onPress: () => console.log('OK Pressed')},
+        ]);
+        console.log(err);
+      };
     }
   }
 
@@ -46,11 +90,6 @@ const OtpScreen = ({navigation}) => {
     }
     return true;
   }
-
-  console.log(
-    'Entered Pin: ',
-    `${pins.pin1}${pins.pin2}${pins.pin3}${pins.pin4}`,
-  );
 
   return (
     <View
@@ -114,17 +153,25 @@ const OtpScreen = ({navigation}) => {
             padding: SIZES.padding,
             borderRadius: SIZES.radius,
           }}>
-          <Text
-            style={[
-              FONTS.h2,
-              {
-                color: allPinsFilled() ? COLORS.white : COLORS.gray,
-                textAlign: 'center',
-                textTransform: 'uppercase',
-              },
-            ]}>
-            Verify
-          </Text>
+          {loading ? (
+            <ActivityIndicator
+              color={COLORS.white}
+              animating={true}
+              size="small"
+            />
+          ) : (
+            <Text
+              style={[
+                FONTS.h2,
+                {
+                  color: allPinsFilled() ? COLORS.white : COLORS.gray,
+                  textAlign: 'center',
+                  textTransform: 'uppercase',
+                },
+              ]}>
+              Verify
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>

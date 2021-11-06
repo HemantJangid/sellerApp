@@ -4,6 +4,8 @@ import {
 } from '@react-navigation/bottom-tabs';
 import {StyleSheet, View, Text, Image, TouchableOpacity} from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome5';
 import React from 'react';
 import ProfileScreen from '../screens/ProfileScreen';
 import OrderScreen from '../screens/OrderScreen';
@@ -11,6 +13,9 @@ import NotificationScreen from '../screens/NotificationScreen';
 import constants from '../constants/constants';
 import ProductScreen from './../screens/ProductScreen';
 import ProductNavigator from './productNavigator';
+import ProfileNavigator from './profileNavigator';
+import orderNavigator from './orderNavigator';
+import {COLORS} from '../constants/theme';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,11 +28,11 @@ const Tabs = () => {
         style: {
           position: 'absolute',
           borderRadius: 10,
-          backgroundColor: '#ffffff',
+          backgroundColor: COLORS.black,
           height: 70,
         },
       }}>
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{
@@ -61,26 +66,21 @@ const Tabs = () => {
             </View>
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Products"
         component={ProductNavigator}
         options={{
           tabBarIcon: ({focused}) => (
             <View style={styles.tabBarIconView}>
-              <Image
-                source={{
-                  uri: 'https://image.flaticon.com/icons/png/128/1768/1768327.png',
-                }}
-                resizeMode="contain"
-                style={[
-                  styles.tabBarIconImage,
-                  {
-                    tintColor: focused
-                      ? constants.focusedTabBarIcon
-                      : constants.unfocusedTabBarIcon,
-                  },
-                ]}
+              <FontAwesomeIcon
+                name="boxes"
+                color={
+                  focused
+                    ? constants.focusedTabBarIcon
+                    : constants.unfocusedTabBarIcon
+                }
+                size={25}
               />
               <Text
                 style={[
@@ -99,23 +99,18 @@ const Tabs = () => {
       />
       <Tab.Screen
         name="Orders"
-        component={OrderScreen}
+        component={orderNavigator}
         options={{
           tabBarIcon: ({focused}) => (
             <View style={styles.tabBarIconView}>
-              <Image
-                source={{
-                  uri: 'https://cdn.iconscout.com/icon/free/png-64/bag-2456546-2036076.png',
-                }}
-                resizeMode="contain"
-                style={[
-                  styles.tabBarIconImage,
-                  {
-                    tintColor: focused
-                      ? constants.focusedTabBarIcon
-                      : constants.unfocusedTabBarIcon,
-                  },
-                ]}
+              <FontAwesomeIcon
+                name="shopping-bag"
+                color={
+                  focused
+                    ? constants.focusedTabBarIcon
+                    : constants.unfocusedTabBarIcon
+                }
+                size={25}
               />
               <Text
                 style={[
@@ -132,7 +127,7 @@ const Tabs = () => {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Notification"
         component={NotificationScreen}
         options={{
@@ -166,26 +161,21 @@ const Tabs = () => {
             </View>
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
-        name="Settings"
-        component={ProfileScreen}
+        name="Profile"
+        component={ProfileNavigator}
         options={{
           tabBarIcon: ({focused}) => (
             <View style={styles.tabBarIconView}>
-              <Image
-                source={{
-                  uri: 'https://cdn.iconscout.com/icon/free/png-64/profile-1481935-1254808.png',
-                }}
-                resizeMode="contain"
-                style={[
-                  styles.tabBarIconImage,
-                  {
-                    tintColor: focused
-                      ? constants.focusedTabBarIcon
-                      : constants.unfocusedTabBarIcon,
-                  },
-                ]}
+              <Icon
+                name="account"
+                color={
+                  focused
+                    ? constants.focusedTabBarIcon
+                    : constants.unfocusedTabBarIcon
+                }
+                size={25}
               />
               <Text
                 style={[

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,97 +9,144 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import globalStyles from '../constants/styles';
-import {Avatar} from 'react-native-paper';
+import {ActivityIndicator, Avatar} from 'react-native-paper';
 import Header from '../components/Header';
-import appTheme from '../constants/theme';
+import appTheme, {COLORS} from '../constants/theme';
+import axios from 'axios';
+import requestUrls from '../constants/requestUrls';
+import {useSelector} from 'react-redux';
 
-const orders = [
-  {
-    customerName: 'Dave',
-    customerLocation: 'Mahalaxmi Nagar',
-    orderValue: 4200,
-  },
-  {
-    customerName: 'Dave',
-    customerLocation: 'Mahalaxmi Nagar',
-    orderValue: 4200,
-  },
-  {
-    customerName: 'Dave',
-    customerLocation: 'Mahalaxmi Nagar',
-    orderValue: 4200,
-  },
-];
+const OrderScreen = ({navigation, ...props}) => {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const {userDetails} = useSelector(state => state.userReducer);
 
-function CurrentOrders() {
-  return (
-    <>
-      <Header name="Orders" />
-      <View style={styles.currentOrderSection}>
-        <Text style={appTheme.FONTS.h2}>Current Orders</Text>
-        <View style={styles.orderCards}>
-          <FlatList
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
-            data={orders}
-            renderItem={({item, index}) => {
-              return (
-                <TouchableHighlight
-                  // onPress={() =>
-                  //   props.navigation.navigate('SubProgramDetails', item)
-                  // }
-                  key={index}
-                  style={styles.cardContainer}>
-                  <View style={[styles.orderCard]}>
-                    <Avatar.Text size={64} label="5" />
-                    <View style={styles.orderInfo}>
-                      <Text style={appTheme.FONTS.h3}>{item.customerName}</Text>
-                      <Text
-                        style={[
-                          appTheme.FONTS.body4,
-                          {color: appTheme.COLORS.gray},
-                        ]}>
-                        {item.customerLocation}
-                      </Text>
-                      <Text
-                        style={[
-                          appTheme.FONTS.body4,
-                          {color: appTheme.COLORS.gray},
-                        ]}>
-                        Order Value: ₹{item.orderValue}
-                      </Text>
+  useEffect(() => {
+    getOrders();
+  }, []);
+
+  useEffect(() => {
+    navigation.addListener('focus', payload => {
+      getOrders();
+    });
+  }, []);
+
+  function getOrders() {
+    setLoading(true);
+    let params = {shopId: userDetails.shopId};
+    axios
+      .get(`http://65.0.17.153:3000/ap1/v1/getCheckoutDetails`, {
+        params,
+      })
+      .then(response => {
+        console.log(response);
+        setLoading(false);
+        if (response.status === 201) {
+        } else if (response.status === 200) {
+          setOrders(response.data);
+        }
+      }).catch = err => {
+      console.log(err);
+    };
+  }
+
+  function handleOrderDetails(order) {
+    navigation.navigate('OrderDetails', {orderInfo: order});
+  }
+
+  function CurrentOrders() {
+    return (
+      <>
+        <View style={styles.currentOrderSection}>
+          <Text style={appTheme.FONTS.h2}>Current Orders</Text>
+          <View style={styles.orderCards}>
+            <FlatList
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+              data={orders}
+              style={{minHeight: 50}}
+              renderItem={({item, index}) => {
+                return (
+                  <TouchableHighlight
+                    onPress={() => handleOrderDetails(item)}
+                    key={index}
+                    style={styles.cardContainer}>
+                    <View style={[styles.orderCard]}>
+                      <Avatar.Image
+                        size={72}
+                        source={{uri: item.checkoutInfo.photoLink}}
+                      />
+                      <View style={styles.orderInfo}>
+                        <Text style={appTheme.FONTS.h3}>
+                          {item.checkoutInfo.name}
+                        </Text>
+                        <Text
+                          style={[
+                            appTheme.FONTS.body4,
+                            {color: appTheme.COLORS.gray},
+                          ]}>
+                          Quantity: {item.checkoutInfo.quantity}
+                        </Text>
+                        <Text
+                          style={[
+                            appTheme.FONTS.body4,
+                            {color: appTheme.COLORS.gray},
+                          ]}>
+                          Order Value: ₹
+                          {item.checkoutInfo.quantity * item.checkoutInfo.sp}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                </TouchableHighlight>
-              );
-            }}
-            keyExtractor={(item, index) => index}
-          />
+                  </TouchableHighlight>
+                );
+              }}
+              keyExtractor={(item, index) => index}
+              onRefresh={() => getOrders()}
+              refreshing={loading}
+            />
+          </View>
+          {orders.length === 0 && (
+            <Text
+              style={[
+                appTheme.FONTS.body3,
+                {textAlign: 'center', marginTop: appTheme.SIZES.padding},
+              ]}>
+              No Orders to show here.
+            </Text>
+          )}
+        </View>
+      </>
+    );
+  }
+
+  function PastOrders() {
+    return (
+      <View style={styles.PastOrderSection}>
+        <Text style={appTheme.FONTS.h2}>Past Orders</Text>
+        <View style={styles.noOrderSection}>
+          <Text style={[appTheme.FONTS.body4, {color: appTheme.COLORS.gray}]}>
+            Nothing to show here
+          </Text>
         </View>
       </View>
-    </>
-  );
-}
+    );
+  }
 
-function PastOrders() {
-  return (
-    <View style={styles.PastOrderSection}>
-      <Text style={appTheme.FONTS.h2}>Past Orders</Text>
-      <View style={styles.noOrderSection}>
-        <Text style={[appTheme.FONTS.body4, {color: appTheme.COLORS.gray}]}>
-          Nothing to show here
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-const OrderScreen = () => {
   return (
     <>
-      <ScrollView style={[globalStyles.screenContainer, {marginBottom: 70}]}>
+      {/* {loading ? (
+        <ActivityIndicator animating={true} color={COLORS.black} size="small" />
+      ) : (
+        <ScrollView style={[globalStyles.screenContainer, {marginBottom: 70}]}>
+          <CurrentOrders />
+          <PastOrders />
+        </ScrollView>
+      )} */}
+      <ScrollView
+        style={[globalStyles.screenContainer, {marginBottom: 70}]}
+        showsVerticalScrollIndicator={false}>
         <CurrentOrders />
-        <PastOrders />
+        {/* <PastOrders /> */}
       </ScrollView>
     </>
   );

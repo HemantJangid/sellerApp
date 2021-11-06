@@ -12,6 +12,14 @@ target 'sellerapp' do
     :hermes_enabled => false
   )
 
+
+
+  pod 'react-native-geolocation', :path => '../node_modules/@react-native-community/geolocation'
+
+  pod 'react-native-element-dropdown', :path => '../node_modules/react-native-element-dropdown'
+
+  pod 'react-native-blob-util', :path => '../node_modules/react-native-blob-util'
+
   target 'sellerappTests' do
     inherit! :complete
     # Pods for testing

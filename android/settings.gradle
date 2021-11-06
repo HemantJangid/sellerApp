@@ -1,3 +1,15 @@
 rootProject.name = 'sellerapp'
+include ':react-native-blob-util'
+project(':react-native-blob-util').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-blob-util/android')
+include ':react-native-element-dropdown'
+project(':react-native-element-dropdown').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-element-dropdown/android')
+include ':@react-native-community_geolocation'
+project(':@react-native-community_geolocation').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/geolocation/android')
+include ':react-native-image-crop-picker'
+project(':react-native-image-crop-picker').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-image-crop-picker/android')
+include ':react-native-image-crop-picker'
+project(':react-native-image-crop-picker').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-image-crop-picker/android')
+include ':react-native-image-picker'
+project(':react-native-image-picker').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-image-picker/android')
 apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 include ':app'

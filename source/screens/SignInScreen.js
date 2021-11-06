@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -6,27 +6,92 @@ import {
   TextInput,
   Button,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import globalStyles from './../constants/styles';
 import {COLORS, FONTS, SIZES} from './../constants/theme';
+import requestUrls from '../constants/requestUrls';
+import {axiosAll} from '../utility/axiosAll';
+import {useDispatch, useSelector} from 'react-redux';
+import {addUser} from '../redux/actions/user';
+import {ActivityIndicator} from 'react-native-paper';
+import axios from 'axios';
 
 const SignInScreen = ({navigation}) => {
   const [number, setNumber] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const user = useSelector(state => state.userReducer);
+  const dispatch = useDispatch();
 
   function onChangeNumber(number) {
     setNumber(number);
   }
 
+  function onChangePassword(password) {
+    setPassword(password);
+  }
+
+  function login() {
+    setLoading(true);
+    let loginDetails = {
+      mobile: number,
+      password: password,
+      app: 'SELLER',
+    };
+    // axiosAll('post', `${requestUrls.login}`, loginDetails)
+    axios
+      .get(`${requestUrls.baseUrl}${requestUrls.sendOTP}`, {
+        params: {
+          mobile: number,
+        },
+      })
+      .then(response => {
+        setLoading(false);
+        if (response.status === 201) {
+          Alert.alert('Send OTP failed!', response.data, [
+            {text: 'OK', onPress: () => console.log('OK Pressed')},
+          ]);
+        } else if (response.status === 200) {
+          setLoading(false);
+          navigation.navigate('OtpScreen', {
+            mobile: number,
+          });
+          // let shop = response.data.shopDetail[0];
+          // let user = response.data.userDetail[0];
+          // let userDetails = {...shop, ...user};
+          // dispatch(addUser(userDetails));
+          // navigation.navigate(
+          //   userDetails.userId
+          //     ? userDetails.role === 'ADMIN'
+          //       ? 'AdminTabs'
+          //       : 'Tabs'
+          //     : 'LandingScreen',
+          // );
+        }
+      }).catch = err => {
+      Alert.alert('SignIn Failed', err, [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ]);
+      console.log(err);
+    };
+  }
+
   function handleSubmit() {
     if (number.length > 0) {
-      navigation.navigate('OtpScreen');
+      login();
     }
   }
 
   return (
     <View
-      style={[globalStyles.screenContainer, {backgroundColor: COLORS.gray}]}>
+      style={[
+        globalStyles.screenContainer,
+        {
+          backgroundColor: COLORS.gray,
+        },
+      ]}>
       <View
         style={{
           position: 'absolute',
@@ -38,11 +103,15 @@ const SignInScreen = ({navigation}) => {
           borderTopRightRadius: SIZES.padding,
           backgroundColor: COLORS.white,
         }}>
-        <Text style={FONTS.body2}>Enter your mobile number to continue</Text>
+        <Text style={FONTS.body2}>
+          Enter your mobile number and password to continue
+        </Text>
         <TextInput
           onChangeText={number => onChangeNumber(number)}
           value={number}
           keyboardType="numeric"
+          placeholder="Mobile number"
+          placeholderTextColor={COLORS.gray}
           style={[
             FONTS.body2,
             {
@@ -54,6 +123,23 @@ const SignInScreen = ({navigation}) => {
             },
           ]}
         />
+        {/* <TextInput
+          onChangeText={password => onChangePassword(password)}
+          value={password}
+          placeholder="Password"
+          secureTextEntry={true}
+          placeholderTextColor={COLORS.gray}
+          style={[
+            FONTS.body2,
+            {
+              marginTop: SIZES.padding,
+              backgroundColor: COLORS.lightGray1,
+              color: COLORS.black,
+              borderRadius: SIZES.radius,
+              padding: SIZES.padding,
+            },
+          ]}
+        /> */}
         <TouchableOpacity
           onPress={() => handleSubmit()}
           style={{
@@ -63,17 +149,27 @@ const SignInScreen = ({navigation}) => {
             padding: SIZES.padding,
             borderRadius: SIZES.radius,
           }}>
-          <Text
-            style={[
-              FONTS.h2,
-              {
-                color: number.length > 0 ? COLORS.white : COLORS.gray,
-                textAlign: 'center',
-                textTransform: 'uppercase',
-              },
-            ]}>
-            Submit
-          </Text>
+          {loading ? (
+            <ActivityIndicator
+              color={COLORS.white}
+              animating={true}
+              size="small"
+            />
+          ) : (
+            <Text
+              style={[
+                FONTS.h2,
+                {
+                  color:
+                    // number.length > 0 && password.length > 0
+                    number.length > 0 ? COLORS.white : COLORS.gray,
+                  textAlign: 'center',
+                  textTransform: 'uppercase',
+                },
+              ]}>
+              Send OTP
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>

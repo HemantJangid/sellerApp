@@ -4,16 +4,24 @@ import {NavigationContainer} from '@react-navigation/native';
 import Tabs from './source/navigation/tabs';
 import RootNavigator from './source/navigation/rootNavigator';
 
-import {ApiServices} from './source/apis/apis';
+import { Provider } from "react-redux";
+import { store, persistor } from "./source/redux/store/index";
+import { PersistGate } from "redux-persist/integration/react";
 
-ApiServices.getProducts();
+// import {ApiServices} from './source/apis/apis';
+
+// ApiServices.getProducts();
 
 const App = () => {
   return (
-    <NavigationContainer>
-      {/* <Tabs /> */}
-      <RootNavigator />
-    </NavigationContainer>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <NavigationContainer>
+          {/* <Tabs /> */}
+          <RootNavigator />
+        </NavigationContainer>
+      </PersistGate>
+    </Provider>
   );
 };
 

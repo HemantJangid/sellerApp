@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -8,61 +8,142 @@ import {
   FlatList,
   TouchableHighlight,
   Image,
+  TouchableOpacity,
 } from 'react-native';
 import globalStyles from '../constants/styles';
 import {Avatar} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Header from '../components/Header';
 import Swiper from 'react-native-swiper';
+import requestUrls from '../constants/requestUrls';
+import axios from 'axios';
+import {COLORS, FONTS} from '../constants/theme';
 
-const ProductDetails = ({navigation, ...props}) => {
-  navigation.setOptions({title: props.route.params.headerTitle});
-  const productInfo = {
-    name: 'Handbag',
-    description:
-      'Handbag for ladies with large capacity:30 cm(Length)*13cm(Width)*23cm(Height ), a good size for carrying all your womanly needs ,pockets for phone etc, et Lots of internal pockets to separate things making them easy to find.',
-    images: [
-      'https://m.media-amazon.com/images/I/7164mGGMT-L._AC_SX679_.jpg',
-      'https://m.media-amazon.com/images/I/71ma+h8YsmS._AC_SY450_.jpg',
-      'https://m.media-amazon.com/images/I/81NPOJcuydS._AC_SY450_.jpg',
-    ],
-    price: 280,
-    selling_price: 250,
-    quantity: 50,
-    status: 'active',
-    color: 'red',
-  };
+const ProductDetails = ({navigation, route, ...props}) => {
+  navigation.setOptions({title: route.params.headerTitle});
+  const [productInfo, setProductInfo] = useState(route.params.productInfo);
+  const [rerender, setRerender] = useState(true);
+  const [productImages, setProductImages] = useState([]);
+
+  useEffect(() => {
+    getAllPhotos();
+  }, []);
+
+  function getAllPhotos() {
+    axios
+      .get(`${requestUrls.baseUrl}${requestUrls.productImages}`, {
+        params: {
+          productId: productInfo.productId,
+        },
+      })
+      .then(response => {
+        if (response.status === 200) {
+          setProductImages(response.data);
+          setRerender(!rerender);
+        }
+      }).catch = err => {
+      console.log(err);
+    };
+  }
+
+  function getProductAttrs() {
+    axios
+      .get(`${requestUrls.baseUrl}${requestUrls.productAttributes}`, {
+        params: {
+          productId: productInfo.productId,
+        },
+      })
+      .then(response => {
+        if (response.status === 200) {
+          setProductImages(response.data);
+          setRerender(!rerender);
+        }
+      }).catch = err => {
+      console.log(err);
+    };
+  }
+
   return (
     <>
       {/* <Header name={productInfo.name} /> */}
-      <ScrollView style={[globalStyles.screenContainer, {marginBottom: 70}]}>
+
+      <ScrollView
+        style={[globalStyles.screenContainer, {marginBottom: 70}]}
+        showsVerticalScrollIndicator={false}>
         {/* <View style={styles.productSection}></View> */}
-        <View style={styles.ImageSwiperContainer}>
-          <Swiper
-            style={styles.wrapper}
-            showsButtons={false}
-            key={(item, index) => index}>
-            {productInfo.images.map((image, index) => {
-              return (
-                <View style={styles.productImageWrapper}>
-                  <Image source={{uri: image}} style={styles.productImage} />
-                </View>
-              );
-            })}
-          </Swiper>
-        </View>
+        {productImages && (
+          <View style={styles.ImageSwiperContainer}>
+            <Swiper
+              style={styles.wrapper}
+              showsButtons={false}
+              key={(item, index) => index}>
+              {productImages.map((image, index) => {
+                return (
+                  <View style={styles.productImageWrapper} key={index}>
+                    <Image
+                      source={{uri: image.photoAddress}}
+                      style={styles.productImage}
+                    />
+                  </View>
+                );
+              })}
+            </Swiper>
+          </View>
+        )}
         <View style={styles.infoContainer}>
           <View style={styles.HeaderContainer}>
             <View>
-              <Text style={styles.productName}>{productInfo.name}</Text>
-              <Text style={styles.productPrice}>₹{productInfo.price}</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
+                <Text style={styles.productName}>{productInfo.name}</Text>
+                {/* <TouchableOpacity
+                  onPress={() => {
+                    console.log('going to product edit');
+                    navigation.navigate('AddEditProduct', {
+                      product: productInfo,
+                      headerTitle: 'Edit Product',
+                    });
+                  }}
+                  style={{}}>
+                  <Text
+                    style={[FONTS.body4, {textDecorationLine: 'underline'}]}>
+                    Edit Product
+                  </Text>
+                </TouchableOpacity> */}
+                <TouchableOpacity
+                  onPress={() => {
+                    console.log('going to product edit');
+                    navigation.navigate('AddEditProduct', {
+                      product: productInfo,
+                      headerTitle: 'Edit Product'
+                    });
+                  }}
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: COLORS.black,
+                    height: 60,
+                    width: 60,
+                    borderRadius: 30,
+                  }}>
+                  <Icon name="pencil" color={COLORS.white} size={30} />
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.productPrice}>Mrp: ₹{productInfo.mrp}</Text>
+              <Text style={styles.productPrice}>
+                Selling Price: ₹{productInfo.sp}
+              </Text>
             </View>
             <View></View>
           </View>
           <View style={styles.descriptionContainer}>
             <Text style={styles.heading}>Description</Text>
             <Text style={styles.productDescription}>
-              {productInfo.description}
+              {productInfo.productSpecification}
             </Text>
           </View>
         </View>

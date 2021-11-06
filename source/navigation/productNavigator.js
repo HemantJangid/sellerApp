@@ -4,6 +4,7 @@ import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ProductScreen from './../screens/ProductScreen';
 import AddEditProduct from './../screens/AddEditProduct';
+import { COLORS } from '../constants/theme';
 
 const Stack = createStackNavigator();
 
@@ -14,15 +15,20 @@ const ProductNavigator = ({navigation}) => {
         name="Products"
         component={ProductScreen}
         options={{
+          headerStyle: {
+            backgroundColor: COLORS.black
+          },
           headerTitleStyle: {
             fontFamily: 'Montserrat-Medium',
+            color: COLORS.white
           },
+          headerLeft: () => null,
           headerRight: () => {
             return (
               <Icon
                 style={{marginRight: 10}}
                 name="plus"
-                color="black"
+                color="white"
                 size={25}
                 onPress={() =>
                   navigation.navigate('AddEditProduct', {
@@ -38,8 +44,16 @@ const ProductNavigator = ({navigation}) => {
         name="ProductDetails"
         component={ProductDetails}
         options={{
+          headerTintColor: COLORS.white,
+          headerStyle: {
+            backgroundColor: COLORS.black
+          },
+          headerTitleContainerStyle: {
+            left: 50
+          },
           headerTitleStyle: {
             fontFamily: 'Montserrat-Medium',
+            color: COLORS.white
           },
         }}
       />
@@ -47,8 +61,16 @@ const ProductNavigator = ({navigation}) => {
         name="AddEditProduct"
         component={AddEditProduct}
         options={{
+          headerTintColor: COLORS.white,
+          headerStyle: {
+            backgroundColor: COLORS.black
+          },
+          headerTitleContainerStyle: {
+            left: 50
+          },
           headerTitleStyle: {
             fontFamily: 'Montserrat-Medium',
+            color: COLORS.white
           },
         }}
       />
